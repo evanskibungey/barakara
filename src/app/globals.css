@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 145 30% 96%;
+    --foreground: 210 40% 3.9%;
+
+    --card: 145 30% 96%;
+    --card-foreground: 210 40% 3.9%;
+
+    --popover: 145 30% 96%;
+    --popover-foreground: 210 40% 3.9%;
+
+    --primary: 142.1 70% 35%;
+    --primary-foreground: 355.7 100% 97.3%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 45 85% 55%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142.1 70% 35%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 142.1 70% 35%;
+    --chart-2: 221.2 83.2% 53.3%;
+    --chart-3: 47.9 95.8% 53.1%;
+    --chart-4: 346.8 77.2% 49.8%;
+    --chart-5: 20.5 90.2% 48.2%;
+  }
+
+  .dark {
+    --background: 146 35% 8%; /* Very dark green */
+    --foreground: 150 20% 95%;
+
+    --card: 148 40% 12%;
+    --card-foreground: 150 20% 95%;
+
+    --popover: 148 30% 9%;
+    --popover-foreground: 150 20% 95%;
+
+    --primary: 142.1 70% 45%; /* Brighter emerald/teal green */
+    --primary-foreground: 146 35% 8%;
+
+    --secondary: 145 50% 20%;
+    --secondary-foreground: 150 20% 95%;
+
+    --muted: 145 40% 15%;
+    --muted-foreground: 150 20% 65%;
+
+    --accent: 142.1 70% 45%;
+    --accent-foreground: 146 35% 8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --border: 145 35% 20%;
+    --input: 145 35% 20%;
+    --ring: 142.1 70% 45%;
+    
+    --chart-1: 142.1 70% 45%;
+    --chart-2: 48 96% 51%;
+    --chart-3: 221.2 83.2% 53.3%;
+    --chart-4: 346.8 77.2% 49.8%;
+    --chart-5: 20.5 90.2% 48.2%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+}
