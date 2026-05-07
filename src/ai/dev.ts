@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/investment-recommendations-from-milestones.ts';
-import '@/ai/flows/summarize-financial-reports.ts';
-import '@/ai/flows/inflation-goal-adjuster.ts';
-import '@/ai/flows/create-documentation.ts';
+import '@/ai/flows/investment-recommendations-from-milestones';
+import '@/ai/flows/summarize-financial-reports';
+import '@/ai/flows/inflation-goal-adjuster';
+import '@/ai/flows/create-documentation';
