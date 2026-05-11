@@ -62,7 +62,7 @@ export function OnboardingForm({ chamaId, mode, onSuccess, onCancel, showRole = 
     try {
       const res = await apiFetch<any>(endpoint, { method: 'POST', body: data });
 
-      if (res.status === 'success' || res.status === 'created') {
+      if (res.status === 'success') {
         if (mode === 'admin') {
           toast({
             title: 'Member Added',
