@@ -2,6 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { BarChart, LineChart as LineChartIcon, PieChart as PieChartIcon, Users, Target, DollarSign, Activity, TrendingUp, UserPlus, MousePointerClick } from 'lucide-react';
 import {
   LineChart,
