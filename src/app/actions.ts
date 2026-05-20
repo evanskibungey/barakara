@@ -1,12 +1,33 @@
 "use server";
 
-import { getInvestmentRecommendations } from "@/ai/flows/investment-recommendations-from-milestones";
-import { summarizeFinancialReports } from "@/ai/flows/summarize-financial-reports";
-import { createDocumentation } from "@/ai/flows/create-documentation";
+import { cookies } from "next/headers";
 import type { InvestmentRecommendationsOutput } from "@/ai/flows/investment-recommendations-from-milestones";
 import { z } from "zod";
 
-// Action for summarizing financial reports
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+
+async function aiPost<T>(
+  path: string,
+  body: unknown
+): Promise<{ status: string; data?: T; message?: string }> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("baraka_token")?.value;
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+
+  return res.json();
+}
+
+// ─── Summarize Financial Report ───────────────────────────────────────────────
+
 export async function summarizeFinancialReportAction(
   prevState: { summary: string },
   formData: FormData
@@ -16,19 +37,28 @@ export async function summarizeFinancialReportAction(
     return { summary: "Please provide a financial report to summarize." };
   }
   try {
-    const result = await summarizeFinancialReports({ financialReport });
-    return { summary: result.summary };
+    const result = await aiPost<{ summary: string }>("/ai/summarize-report", {
+      financialReport,
+    });
+    return {
+      summary: result.data?.summary ?? "No summary was generated.",
+    };
   } catch (error) {
     console.error(error);
     return { summary: "An error occurred while summarizing the report." };
   }
 }
 
-// Schema for investment recommendations form
+// ─── Investment Recommendations ───────────────────────────────────────────────
+
 const investmentSchema = z.object({
   riskTolerance: z.string().min(1, "Please select your risk tolerance."),
-  investmentPreferences: z.string().min(1, "Please enter your investment preferences."),
-  financialHabits: z.string().min(1, "Please describe your financial habits."),
+  investmentPreferences: z
+    .string()
+    .min(1, "Please enter your investment preferences."),
+  financialHabits: z
+    .string()
+    .min(1, "Please describe your financial habits."),
 });
 
 export type InvestmentState = {
@@ -36,7 +66,6 @@ export type InvestmentState = {
   error: string | null;
 };
 
-// Action for getting investment recommendations
 export async function getInvestmentRecommendationsAction(
   prevState: InvestmentState,
   formData: FormData
@@ -54,18 +83,35 @@ export async function getInvestmentRecommendationsAction(
     };
   }
 
-  // Mock milestone data representing a user's goals
   const mockMilestones = [
-    { name: "University Fund for Child", targetAmount: 2000000, currentProgress: 500000, deadline: "2030-09-01" },
-    { name: "New Farm Equipment", targetAmount: 1500000, currentProgress: 750000, deadline: "2026-12-31" },
+    {
+      name: "University Fund for Child",
+      targetAmount: 2000000,
+      currentProgress: 500000,
+      deadline: "2030-09-01",
+    },
+    {
+      name: "New Farm Equipment",
+      targetAmount: 1500000,
+      currentProgress: 750000,
+      deadline: "2026-12-31",
+    },
   ];
 
   try {
-    const recommendations = await getInvestmentRecommendations({
-      milestones: mockMilestones,
-      ...validatedFields.data,
-    });
-    return { recommendations, error: null };
+    const result = await aiPost<InvestmentRecommendationsOutput>(
+      "/ai/investment-recommendations",
+      {
+        milestones: mockMilestones,
+        ...validatedFields.data,
+      }
+    );
+
+    if (!result.data || !result.data.recommendations) {
+      throw new Error(result.message ?? "No recommendations returned.");
+    }
+
+    return { recommendations: result.data, error: null };
   } catch (error) {
     console.error(error);
     return {
@@ -75,11 +121,16 @@ export async function getInvestmentRecommendationsAction(
   }
 }
 
-// Action for creating documentation
+// ─── Create Documentation ─────────────────────────────────────────────────────
+
 const documentationSchema = z.object({
   title: z.string().min(1, "Please enter a title."),
   rawText: z.string().min(1, "Please provide some content."),
-  format: z.enum(['meeting-minutes', 'policy-document', 'financial-report-summary']),
+  format: z.enum([
+    "meeting-minutes",
+    "policy-document",
+    "financial-report-summary",
+  ]),
 });
 
 export type DocumentationState = {
@@ -105,8 +156,16 @@ export async function createDocumentationAction(
   }
 
   try {
-    const result = await createDocumentation(validatedFields.data);
-    return { structuredContent: result.structuredContent, error: null };
+    const result = await aiPost<{ structuredContent: string }>(
+      "/ai/create-documentation",
+      validatedFields.data
+    );
+    return {
+      structuredContent: result.data?.structuredContent ?? null,
+      error: result.data?.structuredContent
+        ? null
+        : "No document content was generated.",
+    };
   } catch (error) {
     console.error(error);
     return {
